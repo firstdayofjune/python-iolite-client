@@ -101,14 +101,14 @@ class IOLiteClient:
             async for response in websocket:
                 logger.debug(f'Response received (heating) {response}', extra={'response': response})
 
-    async def __devices_handler(self) -> NoReturn:
+    async def __devices_ws_handler(self) -> NoReturn:
         logger.info('Connecting to devices WS')
         uri = f'{self.BASE_URL}/devices/ws?SID={self.sid}'
         async with websockets.connect(uri, extra_headers=self.__get_default_headers()) as websocket:
             async for response in websocket:
                 logger.debug(f'Response received (device) {response}', extra={'response': response})
 
-    async def __handler(self) -> NoReturn:
+    async def __json_ws_handler(self) -> NoReturn:
         logger.info('Connecting to JSON WS')
         uri = f'{self.BASE_URL}/bus/websocket/application/json?SID={self.sid}'
         async with websockets.connect(uri, extra_headers=self.__get_default_headers()) as websocket:
@@ -172,6 +172,6 @@ class IOLiteClient:
 
     def connect(self):
         loop = asyncio.get_event_loop()
-        loop.create_task(self.__handler())
-        loop.create_task(self.__devices_handler())
+        loop.create_task(self.__json_ws_handler())
+        loop.create_task(self.__devices_ws_handler())
         loop.run_forever()
